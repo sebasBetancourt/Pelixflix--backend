@@ -1,42 +1,31 @@
-require('dotenv').config();
-const { MongoClient } = require('mongodb');
+// config/config.js
+import dotenv from 'dotenv';
 
-let dbInstance = null;
+dotenv.config();
 
-const connectDB = async () => {
-  try {
-    const client = new MongoClient(process.env.MONGODB_URI);
-    await client.connect();
-    dbInstance = client.db('geekratings');
-    console.log('✅ Connected to MongoDB successfully');
-    
-    // Crear índices
-    await dbInstance.collection('users').createIndex({ email: 1 }, { unique: true });
-    await dbInstance.collection('movies').createIndex({ title: 1 }, { unique: true });
-    await dbInstance.collection('categories').createIndex({ name: 1 }, { unique: true });
-    
-    return dbInstance;
-  } catch (error) {
-    console.error('❌ Database connection failed:', error);
-    process.exit(1);
-  }
-};
-
-const getDB = () => {
-  if (!dbInstance) {
-    throw new Error('Database not initialized. Call connectDB first.');
-  }
-  return dbInstance;
-};
-
-module.exports = {
+const config = {
   port: process.env.PORT || 3000,
-  mongodbUri: process.env.MONGODB_URI,
-  jwtSecret: process.env.JWT_SECRET,
-  jwtExpire: process.env.JWT_EXPIRE,
-  nodeEnv: process.env.NODE_ENV,
-  rateLimit: parseInt(process.env.API_RATE_LIMIT) || 100,
-  rateLimitWindow: parseInt(process.env.API_RATE_LIMIT_WINDOW) || 900000,
-  connectDB,
-  getDB
+  mongodb: {
+    uri: process.env.MONGODB_URI || 'mongodb://localhost:27017',
+    dbName: process.env.DB_NAME || 'netflix-reviews-db'
+  },
+  jwt: {
+    secret: process.env.JWT_SECRET || 'your-secret-key-change-in-production',
+    expiresIn: process.env.JWT_EXPIRES_IN || '24h'
+  },
+  environment: process.env.NODE_ENV || 'development',
+  frontendUrl: process.env.FRONTEND_URL || 'http://localhost:3000',
 };
+
+// Validar variables de entorno críticas
+if (!process.env.JWT_SECRET && config.environment === 'production') {
+  console.error('ERROR: JWT_SECRET no está definido para entorno de producción');
+  process.exit(1);
+}
+
+if (!process.env.MONGODB_URI && config.environment === 'production') {
+  console.error('ERROR: MONGODB_URI no está definido para entorno de producción');
+  process.exit(1);
+}
+
+export default config;
