@@ -8,5 +8,5 @@ const authController = new AuthController();
 
 router.post('/register', registerValidator, authController.register.bind(authController));
 router.post('/login', loginValidator, authController.login.bind(authController));
-
+router.get('/verify', authController.verify.bind(authController));
 export default router;
