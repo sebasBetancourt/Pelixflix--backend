@@ -1,73 +1,66 @@
-/**
- * UserDTO (Data Transfer Object)
- * 
- * Esta clase se encarga de:
- *  - Estandarizar los datos de un usuario.
- *  - Evitar exponer información sensible (como contraseñas).
- *  - Preparar la información para guardar en base de datos o devolver como respuesta en una API.
- */
+// dtos/UserDTO.js
+import bcrypt from 'bcrypt';
+import { ObjectId } from 'mongodb';
 
 class UserDTO {
-
-  /**
-   * Constructor de la clase.
-   * Recibe un objeto `user` (normalmente desde la base de datos) y lo transforma.
-   * 
-   * @param {Object} user - Datos del usuario (documento de MongoDB o similar).
-   */
   constructor(user) {
-    // MongoDB guarda el id como ObjectId, lo convertimos a string para manejarlo más fácil.
     this.id = user._id ? user._id.toString() : null;
-
-    // Guardamos datos principales
     this.email = user.email;
     this.name = user.name;
-
-    // Si no tiene rol asignado, se le pone "user" por defecto.
     this.role = user.role || 'user';
-
-    // Fechas de creación y actualización
+    this.phone = user.phone || null;
+    this.country = user.country || null;
+    this.avatarUrl = user.avatarUrl || null;
     this.createdAt = user.createdAt;
-    this.updatedAt = user.updatedAt;
+    this.banned = user.banned ?? false;
+    this.preferences = user.preferences || {
+      marketingEmails: false,
+      personalizedRecs: true,
+      shareAnonymized: false,
+      dataRetentionMonths: null
+    };
+    this.lists = user.lists || [];
   }
-  
-  /**
-   * Método estático que crea un objeto con la información necesaria
-   * para insertar un nuevo usuario en la base de datos.
-   * 
-   * @param {Object} userData - Datos enviados al registrarse (email, name, password, etc.)
-   * @returns {Object} Objeto listo para guardar en la base de datos.
-   */
-  static createFromData(userData) {
+
+  static async createFromData(userData) {
+    const passwordHash = await bcrypt.hash(userData.password, 10);
+    const now = new Date();
+
     return {
-      email: userData.email,
-      name: userData.name,
-      password: userData.password,   // Nota: Aquí debería encriptarse antes de guardarse.
+      _id: new ObjectId(),
+      email: userData.email.toLowerCase(),
+      passwordHash,
       role: userData.role || 'user',
-      createdAt: new Date(),
-      updatedAt: new Date()
+      name: userData.name || '',
+      phone: userData.phone || null,
+      country: userData.country || null,
+      avatarUrl: userData.avatarUrl || null,
+      createdAt: now,
+      banned: false,
+      preferences: {
+        marketingEmails: false,
+        personalizedRecs: true,
+        shareAnonymized: false
+      },
+      lists: []
     };
   }
-  
-  /**
-   * Método que devuelve un objeto con los datos del usuario 
-   * que se pueden enviar como respuesta en la API.
-   * 
-   * Importante: No devuelve la contraseña (por seguridad).
-   * 
-   * @returns {Object} Datos del usuario listos para enviar al frontend.
-   */
+
   toResponse() {
     return {
       id: this.id,
       email: this.email,
       name: this.name,
       role: this.role,
+      phone: this.phone,
+      country: this.country,
+      avatarUrl: this.avatarUrl,
       createdAt: this.createdAt,
-      updatedAt: this.updatedAt
+      banned: this.banned,
+      preferences: this.preferences,
+      lists: this.lists
     };
   }
 }
 
-// Exportamos la clase para poder usarla en otros archivos.
-module.exports = UserDTO;
+export default UserDTO;
