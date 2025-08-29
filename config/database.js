@@ -200,27 +200,25 @@ class Database {
         validator: {
           $jsonSchema: {
             bsonType: 'object',
-            required: ['type', 'title', 'status', 'createdAt'],
+            required: ['type', 'title',  'description', 'status', 'createdAt'],
             properties: {
-              externalId: { bsonType: ['string', 'null'] },
-              type: { enum: ['movie', 'tv', 'anime'] },
-              title: { bsonType: 'string' },
-              description: { bsonType: 'string' },
+              type: { bsonType: "string", enum: ['movie', 'tv', 'anime'] },//
+              title: { bsonType: 'string' },//
+              description: { bsonType: 'string' },//
               author: { bsonType: 'string' },
               year: { bsonType: 'number' },
-              genres: { bsonType: 'array', items: { bsonType: 'string' } },
+              temps: { bsonType: 'int'},
+              epds: { bsonType: 'int' },
               categoriesIds: { bsonType: 'array', items: { bsonType: 'objectId' } },
               posterUrl: { bsonType: 'string' },
               images: { bsonType: 'array', items: { bsonType: 'string' } },
-              status: { enum: ['pending', 'approved', 'rejected'] },
+              status: { bsonType: "string", enum: ['pending', 'approved', 'rejected'] },//
               ratingAvg: { bsonType: 'number', minimum: 0, maximum: 10 },
               ratingCount: { bsonType: 'number', minimum: 0 },
               likes: { bsonType: 'number', minimum: 0 },
               dislikes: { bsonType: 'number', minimum: 0 },
               createdBy: { bsonType: 'objectId' },
-              createdAt: { bsonType: 'date' },
-              updatedAt: { bsonType: 'date' },
-              metadata: { bsonType: 'object' }
+              createdAt: { bsonType: 'date' }//
             }
           }
         }
