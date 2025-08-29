@@ -3,6 +3,10 @@ import  UserDTO  from '../models/dto/UserDTO.js';
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
 
+
+
+
+
 export class AuthController {
   async login(req, res) {
     try {
@@ -60,18 +64,21 @@ export class AuthController {
         return res.status(400).json({ message: 'El usuario ya existe' });
       }
 
-      const hashedPassword = await bcrypt.hash(password, 10);
-      const userData = UserDTO.createFromData({
+      const saltRounds = 10;
+      const hashedPassword = await bcrypt.hash(password, saltRounds);
+      const data = UserDTO.createFromData({
         email,
         name,
         passwordHash: hashedPassword,
-        phone: phone || null,
-        country: country || null,
+        phone: phone,
+        country: country,
         role: 'user'
       });
 
-      console.log('Creando usuario:', userData);
-      await UserModel.create(userData);
+      console.log('Creando usuario:', data);
+      await UserModel.create(data);
+      console.log(data);
+      
       res.status(201).json({ message: 'Usuario registrado exitosamente' });
     } catch (err) {
       console.error('Error en register:', err);

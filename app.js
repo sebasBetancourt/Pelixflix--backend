@@ -22,6 +22,9 @@ import { startServer } from "./helpers/server.js";
 dotenv.config();
 const app = express();
 
+
+app.use(express.json({ limit: '10mb' }));
+
 // Middlewares
 app.use(helmet());
 app.use(cors({
@@ -39,7 +42,6 @@ app.use((req, res, next) => {
 });
 
 app.use(morgan('combined'));
-app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
