@@ -1,4 +1,3 @@
-// config/database.js
 import { MongoClient, ObjectId } from 'mongodb';
 import bcrypt from 'bcrypt';
 

@@ -1,7 +1,7 @@
 // test-connection.js
 import dotenv from 'dotenv';
 dotenv.config();
-import database from './config/database.js';
+import database from '../config/database.js';
 
 async function testConnection() {
   try {
