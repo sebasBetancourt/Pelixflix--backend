@@ -14,9 +14,9 @@ class UserModel {
 
   static async create(userData) {
     try {
-      const userDTO = await UserDTO.createFromData(userData);
-      console.log('Documento a insertar:', JSON.stringify(userDTO, null, 2));
-      const result = await this.getDb().collection(this.collectionName).insertOne(userDTO);
+      console.log(userData);
+      console.log(typeof(userData));
+      const result = await this.getDb().collection(this.collectionName).insertOne(userData);
       return result.insertedId;
     } catch (err) {
       throw new Error(`Error al crear usuario: ${err.message}`);

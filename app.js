@@ -22,6 +22,9 @@ import { startServer } from "./helpers/server.js";
 dotenv.config();
 const app = express();
 
+
+app.use(express.json({ limit: '10mb' }));
+
 // Middlewares
 app.use(helmet());
 app.use(cors({
@@ -39,7 +42,6 @@ app.use((req, res, next) => {
 });
 
 app.use(morgan('combined'));
-app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
@@ -60,7 +62,7 @@ app.use("/user", userRoutes);
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-const swaggerPath = path.join(__dirname, "../swagger.json");
+const swaggerPath = path.join(__dirname, "./swagger.json");
 
 if (fs.existsSync(swaggerPath)) {
   const swaggerDocument = JSON.parse(fs.readFileSync(swaggerPath, "utf-8"));

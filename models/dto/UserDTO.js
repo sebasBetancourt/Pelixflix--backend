@@ -1,10 +1,8 @@
-// dtos/UserDTO.js
 import bcrypt from 'bcrypt';
 import { ObjectId } from 'mongodb';
 
 class UserDTO {
   constructor(user) {
-    this.id = user._id ? user._id.toString() : null;
     this.email = user.email;
     this.name = user.name;
     this.role = user.role || 'user';
@@ -22,29 +20,26 @@ class UserDTO {
     this.lists = user.lists || [];
   }
 
-  static async createFromData(userData) {
-    const passwordHash = await bcrypt.hash(userData.password, 10);
-    const now = new Date();
-
+  static createFromData(userData) {
     return {
-      _id: new ObjectId(),
-      email: userData.email.toLowerCase(),
-      passwordHash,
+      email: userData.email,
+      passwordHash: userData.passwordHash,
       role: userData.role || 'user',
-      name: userData.name || '',
-      phone: userData.phone || null,
-      country: userData.country || null,
-      avatarUrl: userData.avatarUrl || null,
-      createdAt: now,
-      banned: false,
-      preferences: {
+      name: userData.name ?? null,
+      phone: userData.phone ?? null,
+      country: userData.country ?? null,
+      avatarUrl: userData.avatarUrl ?? "",
+      createdAt: new Date(),
+      banned: userData.banned ?? false,
+      preferences: userData.preferences || {
         marketingEmails: false,
         personalizedRecs: true,
         shareAnonymized: false
       },
-      lists: []
+      lists: userData.lists || []
     };
   }
+  
 
   toResponse() {
     return {
@@ -63,4 +58,4 @@ class UserDTO {
   }
 }
 
-export default UserDTO;
+export default UserDTO
