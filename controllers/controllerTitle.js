@@ -101,7 +101,6 @@ export class TitleController {
     }
   }
 
-  // Aprobar título (solo admin)
   async approve(req, res) {
     try {
       if (req.user.role !== 'admin') {
@@ -117,7 +116,6 @@ export class TitleController {
     }
   }
 
-  // Eliminar (admin)
   async delete(req, res) {
     try {
       if (req.user.role !== 'admin') {

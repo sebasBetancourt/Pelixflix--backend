@@ -235,7 +235,6 @@ class Database {
     const categoriesCollection = this.getCollection('categories');
 
     // Crear índices
-    await categoriesCollection.createIndex({ slug: 1 }, { unique: true });
     await categoriesCollection.createIndex({ name: 1 }, { unique: true });
 
     // Validación de esquema
@@ -245,12 +244,12 @@ class Database {
         validator: {
           $jsonSchema: {
             bsonType: 'object',
-            required: ['name', 'slug', 'createdAt'],
+            required: ['name', 'createdAt'],
             properties: {
               name: { bsonType: 'string' },
-              slug: { bsonType: 'string' },
               createdAt: { bsonType: 'date' }
-            }
+            },
+            addionalProperties: false
           }
         }
       });
