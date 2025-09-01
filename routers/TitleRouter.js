@@ -10,4 +10,6 @@ router.post("/create", titleValidator, titleController.create);
 
 router.get("/list", titleController.list);
 
+router.get("/:id", titleController.getById);
+
 export default router;

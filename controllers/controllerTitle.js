@@ -79,6 +79,17 @@ export class TitleController {
       res.status(500).json({ message: 'Error al listar títulos', error: err.message });
     }
   }
+  async getById(req, res) {
+    try {
+      const { id } = req.params;
+      const title = await TitleModel.findById(id);
+    
+      if (!title) return res.status(404).json({ message: "Título no encontrado" });
+      res.json(title);
+    } catch (err) {
+      res.status(500).json({ message: "Error al obtener título", error: err.message });
+    }
+  }
 
   async detail(req, res) {
     try {

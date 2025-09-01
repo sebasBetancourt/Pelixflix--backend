@@ -27,13 +27,59 @@ class TitleModel {
     }
   }
 
+  // models/TitleModel.js
   static async findById(id) {
     try {
-      return await this.getDb().collection(this.collectionName).findOne({ _id: new ObjectId(id) });
-    } catch (error) {
-      throw new Error('Formato de ID inválido');
+      const pipeline = [
+        { $match: { _id: new ObjectId(id) } },
+        {
+          $lookup: {
+            from: "categories",
+            localField: "categoriesIds",
+            foreignField: "_id",
+            as: "categories"
+          }
+        },
+        {
+          $lookup: {
+            from: "users",
+            localField: "createdBy",
+            foreignField: "_id",
+            as: "creator"
+          }
+        },
+        {
+          $project: {
+            _id: 1,
+            title: 1,
+            description: 1,
+            type: 1,
+            temps: 1,
+            eps: 1,
+            year: 1,
+            createdAt: 1,
+            likes: 1,
+            dislikes: 1,
+            posterUrl: 1,
+            ratingAvg: 1,
+            ratingCount: 1,
+            status: 1,
+            author: 1,
+            categories: { $map: { input: "$categories", as: "cat", in: "$$cat.name" } },
+            creator: { $arrayElemAt: ["$creator.name", 0] },
+            // 👇 si quieres comentarios en DB
+            comments: 1
+          }
+        }
+      ];
+    
+      return await this.getDb().collection(this.collectionName)
+        .aggregate(pipeline).next();
+    } catch (err) {
+      throw new Error(`Error al obtener título: ${err.message}`);
     }
   }
+
   static async findByName(name) {
     try {
       return await this.getDb().collection(this.collectionName).findOne({ title: name});
@@ -76,7 +122,7 @@ class TitleModel {
       // Proyectar (excluir _id y mostrar lo que necesitas)
       pipeline.push({
         $project: {
-          _id: 0,
+          _id: 1,
           title: 1,
           description: 1,
           type: 1,
