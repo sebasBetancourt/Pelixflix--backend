@@ -1,9 +1,7 @@
 import CategoriesModel from '../models/classes/CategoriesModel.js';
 import CategoriesDTO from '../models/dto/CategoriesDTO.js';
-import database from '../config/database.js';
 
 
-const db = database.db;
 
 export class CategoriesController {
 
@@ -44,68 +42,54 @@ export class CategoriesController {
 
   async list(req, res) {
     try {
-      const { skip, limit, categoriesId } = req.query;
-      const titles = await TitleModel.findAll({ 
-        skip: parseInt(skip) || 0, 
-        limit: parseInt(limit) || 10, 
-        categoriesId 
-      });
-      res.json(titles);
+      const { skip, limit } = req.query;
+      const Categorias = await CategoriesModel.findAll(
+        parseInt(skip) || 0,
+        parseInt(limit) || 10
+      );
+      res.json(Categorias);
     } catch (err) {
-      res.status(500).json({ message: 'Error al listar títulos', error: err.message });
+      res.status(500).json({ message: 'Error al listar Categorias', error: err.message });
     }
   }
   async getById(req, res) {
     try {
       const { id } = req.params;
-      const title = await TitleModel.findById(id);
+      const name = await CategoriesModel.findById(id);
     
-      if (!title) return res.status(404).json({ message: "Título no encontrado" });
-      res.json(title);
+      if (!name) return res.status(404).json({ message: "Categoria no encontrada" });
+      res.json(name);
     } catch (err) {
-      res.status(500).json({ message: "Error al obtener título", error: err.message });
+      res.status(500).json({ message: "Error al obtener categoria", error: err.message });
     }
   }
 
-  async detail(req, res) {
+  async getByName(req, res) {
     try {
-      const title = await TitleModel.findById(req.params.id);
-      if (!title) return res.status(404).json({ message: 'Título no encontrado' });
-      res.json(title);
+      const { name } = req.params;
+      const nombre = await CategoriesModel.findByName(name);
+    
+      if (!nombre) return res.status(404).json({ message: "Categoria no encontrada" });
+      res.json(nombre);
     } catch (err) {
-      res.status(500).json({ message: 'Error al obtener título', error: err.message });
-    }
-  }
-
-  async approve(req, res) {
-    try {
-      if (req.user.role !== 'admin') {
-        return res.status(403).json({ message: 'Solo los administradores pueden aprobar títulos' });
-      }
-
-      const updated = await TitleModel.update(req.params.id, { status: 'approved' });
-      if (!updated) return res.status(404).json({ message: 'Título no encontrado' });
-
-      res.json({ message: 'Título aprobado' });
-    } catch (err) {
-      res.status(500).json({ message: 'Error al aprobar título', error: err.message });
+      res.status(500).json({ message: "Error al obtener categoria", error: err.message });
     }
   }
 
   async delete(req, res) {
     try {
       if (req.user.role !== 'admin') {
-        return res.status(403).json({ message: 'Solo los administradores pueden eliminar títulos' });
+        return res.status(403).json({ message: 'Solo los administradores pueden eliminar Categorias' });
       }
 
-      const deleted = await TitleModel.delete(req.params.id);
-      if (!deleted) return res.status(404).json({ message: 'Título no encontrado' });
+      const deleted = await CategoriesModel.delete(req.params.id);
+      if (!deleted) return res.status(404).json({ message: 'Categoria no encontrada' });
 
-      res.json({ message: 'Título eliminado' });
+      res.json({ message: 'Categoria eliminada' });
     } catch (err) {
-      res.status(500).json({ message: 'Error al eliminar título', error: err.message });
+      res.status(500).json({ message: 'Error al eliminar categoria', error: err.message });
     }
   }
 }
 
-export default TitleController;
+export default CategoriesController;

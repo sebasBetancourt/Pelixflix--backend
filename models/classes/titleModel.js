@@ -27,7 +27,6 @@ class TitleModel {
     }
   }
 
-  // models/TitleModel.js
   static async findById(id) {
     try {
       const pipeline = [
@@ -67,7 +66,6 @@ class TitleModel {
             author: 1,
             categories: { $map: { input: "$categories", as: "cat", in: "$$cat.name" } },
             creator: { $arrayElemAt: ["$creator.name", 0] },
-            // 👇 si quieres comentarios en DB
             comments: 1
           }
         }
@@ -88,38 +86,45 @@ class TitleModel {
     }
   }
 
-  static async findAll({ skip = 0, limit = 10, categoryId = null, status = 'approved' } = {}) {
+
+
+  static async findAll({ skip = 0, limit = 10, categoryId = null, status = 'approved', type = null } = {}) {
     try {
       const pipeline = [];
-
-      // Filtro base
       const match = {};
-      if (categoryId) match.categoriesIds = new ObjectId(categoryId);
+
+      // Filtrar por categoría
+      if (categoryId) {
+        match.categoriesIds = new ObjectId(categoryId); 
+      }
+
+      // Filtrar por status y tipo
       if (status) match.status = status;
+      if (type) match.type = type;
 
       pipeline.push({ $match: match });
 
-      // Unir categorías
+      // Lookup de categorías
       pipeline.push({
         $lookup: {
-          from: 'categories', // nombre de la colección de categorías
+          from: 'categories',
           localField: 'categoriesIds',
           foreignField: '_id',
           as: 'categories'
         }
       });
 
-      // Unir creador
+      // Lookup de creador
       pipeline.push({
         $lookup: {
-          from: 'users', // colección de usuarios
+          from: 'users',
           localField: 'createdBy',
           foreignField: '_id',
           as: 'creator'
         }
       });
 
-      // Proyectar (excluir _id y mostrar lo que necesitas)
+      // Proyección
       pipeline.push({
         $project: {
           _id: 1,
@@ -144,7 +149,6 @@ class TitleModel {
         }
       });
 
-
       // Paginación
       pipeline.push({ $skip: skip });
       pipeline.push({ $limit: limit });
@@ -154,6 +158,12 @@ class TitleModel {
       throw new Error(`Error al listar todos los títulos: ${err.message}`);
     }
   }
+
+
+
+
+
+  
 
 
   static async update(id, updateData) {

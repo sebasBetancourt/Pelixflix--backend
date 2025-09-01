@@ -68,17 +68,25 @@ export class TitleController {
 
   async list(req, res) {
     try {
-      const { skip, limit, categoriesId } = req.query;
-      const titles = await TitleModel.findAll({ 
-        skip: parseInt(skip) || 0, 
-        limit: parseInt(limit) || 10, 
-        categoriesId 
+      const { skip = 0, limit = 10, categoriesId = null, type = null } = req.query;
+
+      // Llamamos a la función del modelo
+      const titles = await TitleModel.findAll({
+        skip: parseInt(skip),
+        limit: parseInt(limit),
+        categoryId: categoriesId, // filtramos por categoryId
+        type // filtramos por tipo si se pasa
       });
+
       res.json(titles);
     } catch (err) {
+      console.error(err);
       res.status(500).json({ message: 'Error al listar títulos', error: err.message });
     }
   }
+
+
+
   async getById(req, res) {
     try {
       const { id } = req.params;
@@ -90,7 +98,6 @@ export class TitleController {
       res.status(500).json({ message: "Error al obtener título", error: err.message });
     }
   }
-
   async detail(req, res) {
     try {
       const title = await TitleModel.findById(req.params.id);
