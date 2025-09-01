@@ -77,8 +77,22 @@ class TitleModel {
       pipeline.push({
         $project: {
           _id: 0,
-          categoriesIds: 0,
-          createdBy: 0,
+          title: 1,
+          description: 1,
+          type: 1,
+          temps: 1,
+          eps: 1,
+          year: 1,
+          createdAt: 1,
+          likes: 1,
+          dislikes: 1,
+          posterUrl: 1,
+          ratingAvg: 1,
+          ratingCount: 1,
+          status: 1,
+          author: 1,
+          categoriesIds: 1,
+          createdBy: 1,
           categories: { $map: { input: "$categories", as: "cat", in: "$$cat.name" } },
           creator: { $arrayElemAt: ["$creator.name", 0] }
         }

@@ -8,6 +8,6 @@ const titleController = new TitleController();
 
 router.post("/create", titleValidator, titleController.create);
 
-router.get("/list", titleValidator, TitleController.list);
+router.get("/list", titleController.list);
 
 export default router;

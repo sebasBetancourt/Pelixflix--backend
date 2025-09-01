@@ -7,7 +7,7 @@ const db = database.db;
 
 export class TitleController {
 
-  
+
   async create(req, res) {
     try {
       if (req.user.role !== 'admin') {
@@ -68,11 +68,11 @@ export class TitleController {
 
   async list(req, res) {
     try {
-      const { skip, limit, categoryId } = req.query;
+      const { skip, limit, categoriesId } = req.query;
       const titles = await TitleModel.findAll({ 
         skip: parseInt(skip) || 0, 
         limit: parseInt(limit) || 10, 
-        categoryId 
+        categoriesId 
       });
       res.json(titles);
     } catch (err) {
