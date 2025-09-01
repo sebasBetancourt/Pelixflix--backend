@@ -6,8 +6,6 @@ import { ObjectId } from "bson";
 const router = Router();
 
 
-// Ver Todos los Usuarios
-// GET /usuarios/list
 router.get("/list", async function (req, res) {
   try {
     const usuarios = await database.db.collection("usuarios").find().toArray();
@@ -17,8 +15,6 @@ router.get("/list", async function (req, res) {
   }
 });
 
-// Ver un Usuario por ID
-// GET /usuarios/get/:id
 router.get("/get/:id", async function (req, res) {
   try {
     const idUsuario = parseInt(req.params.id);

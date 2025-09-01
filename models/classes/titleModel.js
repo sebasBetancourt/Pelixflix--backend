@@ -104,7 +104,6 @@ class TitleModel {
 
       pipeline.push({ $match: match });
 
-      // Lookup de categorías
       pipeline.push({
         $lookup: {
           from: 'categories',
@@ -114,7 +113,6 @@ class TitleModel {
         }
       });
 
-      // Lookup de creador
       pipeline.push({
         $lookup: {
           from: 'users',
@@ -124,7 +122,6 @@ class TitleModel {
         }
       });
 
-      // Proyección
       pipeline.push({
         $project: {
           _id: 1,

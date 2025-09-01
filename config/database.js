@@ -248,8 +248,7 @@ class Database {
             properties: {
               name: { bsonType: 'string' },
               createdAt: { bsonType: 'date' }
-            },
-            addionalProperties: false
+            }
           }
         }
       });

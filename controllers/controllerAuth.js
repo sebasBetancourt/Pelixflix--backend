@@ -34,18 +34,24 @@ export class AuthController {
       );
 
       const userDTO = new UserDTO(user);
-      console.log('Login exitoso, token generado:', token); // Para depuración
+      res.cookie("token", token, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "lax", 
+        maxAge: 1000 * 60 * 60 * 24,
+      });
+    
       res.json({
-        message: 'Login exitoso',
+        message: "Login exitoso",
         user: {
           email: userDTO.email,
           role: userDTO.role
-        },
-        token
+        }
       });
+    
     } catch (err) {
-      console.error('Error en login:', err);
-      res.status(500).json({ message: 'Error en el servidor', error: err.message });
+      console.error("Error en login:", err);
+      res.status(500).json({ message: "Error en el servidor", error: err.message });
     }
   }
 
@@ -91,26 +97,37 @@ export class AuthController {
 
   async verify(req, res) {
     try {
-      const token = req.headers.authorization?.split('Bearer ')[1];
+      const token = req.cookies.token;
       if (!token) {
-        console.log('No se proporcionó token');
-        return res.status(401).json({ message: 'No se proporcionó token' });
+        return res.status(401).json({ message: "No se proporcionó token" });
       }
-
+  
       const decoded = jwt.verify(token, process.env.JWT_SECRET);
-      console.log('Token decodificado:', decoded); // Para depuración
       const user = await UserModel.findByEmail(decoded.email);
+  
       if (!user) {
-        console.log('Usuario no encontrado:', decoded.email);
-        return res.status(401).json({ message: 'Usuario no encontrado' });
+        return res.status(401).json({ message: "Usuario no encontrado" });
       }
-
-      res.json({ message: 'Token válido', user: { email: user.email, role: user.role } });
+  
+      res.json({ message: "Token válido", user: { email: user.email, role: user.role } });
     } catch (err) {
-      console.error('Error en verify:', err);
-      res.status(500).json({ message: 'Token inválido', error: err.message });
+      console.error("Error en verify:", err);
+      res.status(401).json({ message: "Token inválido", error: err.message });
     }
   }
+  
+
+  async logout(req, res) {
+    res.clearCookie("token", {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict"
+    });
+    res.clearCookie("user");
+    res.json({ message: "Logout exitoso" });
+  }
+  
+  
 }
 
 export default AuthController;

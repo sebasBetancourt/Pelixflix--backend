@@ -5,7 +5,8 @@ import { registerValidator, loginValidator } from '../middleware/validators/user
 const router = Router();
 const authController = new AuthController();
 
-router.post('/register', registerValidator, authController.register.bind(authController));
-router.post('/login', loginValidator, authController.login.bind(authController));
-router.get('/verify', authController.verify.bind(authController));
+router.post('/register', registerValidator, authController.register);
+router.post('/login', loginValidator, authController.login);
+router.get('/verify', authController.verify);
+router.post('/logout', authController.logout);
 export default router;
