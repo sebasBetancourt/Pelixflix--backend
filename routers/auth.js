@@ -1,9 +1,8 @@
-// routes/auth.js
-import express from 'express';
+import { Router } from 'express';
 import AuthController from '../controllers/controllerAuth.js';
 import { registerValidator, loginValidator } from '../middleware/validators/userValidator.js';
 
-const router = express.Router();
+const router = Router();
 const authController = new AuthController();
 
 router.post('/register', registerValidator, authController.register.bind(authController));

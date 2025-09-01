@@ -1,19 +1,13 @@
-// routes/TitleRouter.js
 import { Router } from "express";
 import TitleController from "../controllers/controllerTitle.js";
-import { titleValidator } from "../validators/titleValidator.js";
-import validateDTO from "../middlewares/validateDTO.js";
+import { titleValidator } from "../middleware/validators/titlesValidator.js";
+import { validatorFieldsDTO } from "../middleware/validatorFieldsDTO.js";
 
 const router = Router();
+const titleController = new TitleController();
 
-router.post("/", validateDTO(titleValidator), TitleController.create);
+router.post("/create", titleValidator, titleController.create);
 
-router.get("/", TitleController.getAll);
-
-router.get("/:id", TitleController.getById);
-
-router.put("/:id", validateDTO(titleValidator), TitleController.update);
-
-router.delete("/:id", TitleController.delete);
+router.get("/list", titleValidator, TitleController.list);
 
 export default router;

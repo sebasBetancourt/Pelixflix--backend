@@ -1,37 +1,71 @@
 import TitleModel from '../models/classes/titleModel.js';
+import TitleDTO from '../models/dto/TitleDTO.js';
+import database from '../config/database.js';
+
+
+const db = database.db;
 
 export class TitleController {
+
+  
   async create(req, res) {
     try {
       if (req.user.role !== 'admin') {
         return res.status(403).json({ message: 'Solo los administradores pueden crear títulos' });
       }
 
-      const { title, description, type, year, categoriesIds, posterUrl, author, temps, epds } = req.body;
+      const { title, description, type, year, categoriesIds, posterUrl, author, temps, epds, createdBy } = req.body;
 
-      if (!title || !description || !year || !categoriesIds) {
+      if (!title || !type || !description || !year || !categoriesIds || !author || !createdBy) {
         return res.status(400).json({ message: 'Faltan campos obligatorios' });
       }
 
-      const id = await TitleModel.create({
-        title,
-        description,
-        type,
-        year,
-        categoriesIds: categoriesIds.map(id => new ObjectId(id)),
-        posterUrl: posterUrl || null,
-        author,
-        temps: temps || null,
-        epds: epds || null
-      });
 
+      const existingTitle = await TitleModel.findByName(title);
+      if (existingTitle) {
+        console.log('Titulo ya existe:', title);
+        return res.status(400).json({ message: 'El Titulo ya existe, escoge otro nombre' });
+      }
+
+      const user = await db.collection('users').findOne({ email: createdBy }).insertedId;
+
+      if (type === 'tv' || type === 'anime') {
+        const id = await TitleDTO.createFromDataSerie({
+          title,
+          description,
+          type,
+          year,
+          createdBy: user,
+          categoriesIds: categoriesIds.map(id => new ObjectId(id)),
+          posterUrl: posterUrl || "",
+          author,
+          temps: temps || 1,
+          epds: epds || 1
+        }); 
+        return id; 
+      } else if(type === 'movie') {
+        const id = await TitleDTO.createFromDataMovie({
+          title,
+          description,
+          type,
+          year,
+          createdBy: user,
+          categoriesIds: categoriesIds.map(id => new ObjectId(id)),
+          posterUrl: posterUrl || "",
+          author
+        });
+        return id;
+      }
+
+      console.log('Creando Titulo:', id);
+      await TitleModel.create(id);
+      console.log(id);
       res.status(201).json({ message: 'Título creado exitosamente', id });
     } catch (err) {
       res.status(500).json({ message: 'Error al crear título', error: err.message });
     }
   }
 
-  // Listar
   async list(req, res) {
     try {
       const { skip, limit, categoryId } = req.query;
@@ -46,7 +80,6 @@ export class TitleController {
     }
   }
 
-  // Ver detalle
   async detail(req, res) {
     try {
       const title = await TitleModel.findById(req.params.id);

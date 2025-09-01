@@ -1,4 +1,3 @@
-// validators/userValidator.js
 import { body } from 'express-validator';
 import { validatorFieldsDTO } from '../validatorFieldsDTO.js';
 

@@ -1,6 +1,3 @@
-import bcrypt from 'bcrypt';
-import { ObjectId } from 'mongodb';
-
 class UserDTO {
   constructor(user) {
     this.email = user.email;

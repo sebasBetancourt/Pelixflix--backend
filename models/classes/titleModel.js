@@ -20,15 +20,7 @@ class TitleModel {
         throw new Error('Ya existe un título con ese nombre');
       }
 
-      const result = await this.getDb().collection(this.collectionName).insertOne({
-        ...titleData,
-        createdAt: new Date(),
-        likes: 0,
-        dislikes: 0,
-        ratingAvg: 0,
-        ratingCount: 0,
-        status: 'pending' 
-      });
+      const result = await this.getDb().collection(this.collectionName).insertOne(titleData);
       return result.insertedId;
     } catch (err) {
       throw new Error(`Error al crear título: ${err.message}`);
@@ -42,22 +34,67 @@ class TitleModel {
       throw new Error('Formato de ID inválido');
     }
   }
+  static async findByName(name) {
+    try {
+      return await this.getDb().collection(this.collectionName).findOne({ title: name});
+    } catch (error) {
+      throw new Error('Formato de Nombre inválido');
+    }
+  }
 
   static async findAll({ skip = 0, limit = 10, categoryId = null, status = 'approved' } = {}) {
     try {
-      const query = {};
-      if (categoryId) query.categoriesIds = new ObjectId(categoryId);
-      if (status) query.status = status;
+      const pipeline = [];
 
-      return await this.getDb().collection(this.collectionName)
-        .find(query)
-        .skip(skip)
-        .limit(limit)
-        .toArray();
+      // Filtro base
+      const match = {};
+      if (categoryId) match.categoriesIds = new ObjectId(categoryId);
+      if (status) match.status = status;
+
+      pipeline.push({ $match: match });
+
+      // Unir categorías
+      pipeline.push({
+        $lookup: {
+          from: 'categories', // nombre de la colección de categorías
+          localField: 'categoriesIds',
+          foreignField: '_id',
+          as: 'categories'
+        }
+      });
+
+      // Unir creador
+      pipeline.push({
+        $lookup: {
+          from: 'users', // colección de usuarios
+          localField: 'createdBy',
+          foreignField: '_id',
+          as: 'creator'
+        }
+      });
+
+      // Proyectar (excluir _id y mostrar lo que necesitas)
+      pipeline.push({
+        $project: {
+          _id: 0,
+          categoriesIds: 0,
+          createdBy: 0,
+          categories: { $map: { input: "$categories", as: "cat", in: "$$cat.name" } },
+          creator: { $arrayElemAt: ["$creator.name", 0] }
+        }
+      });
+
+
+      // Paginación
+      pipeline.push({ $skip: skip });
+      pipeline.push({ $limit: limit });
+
+      return await this.getDb().collection(this.collectionName).aggregate(pipeline).toArray();
     } catch (err) {
-      throw new Error(`Error al listar títulos: ${err.message}`);
+      throw new Error(`Error al listar todos los títulos: ${err.message}`);
     }
   }
+
 
   static async update(id, updateData) {
     try {
