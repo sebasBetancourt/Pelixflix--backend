@@ -68,7 +68,7 @@ export class TitleController {
 
   async list(req, res) {
     try {
-      const { skip = 0, limit = 10, categoriesId = null, type = null } = req.query;
+      const { skip = 0, limit = 30, categoriesId = null, type = null } = req.query;
 
       // Llamamos a la función del modelo
       const titles = await TitleModel.findAll({

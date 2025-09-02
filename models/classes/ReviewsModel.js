@@ -99,6 +99,7 @@ class ReviewModel {
           likesCount: 1,
           dislikesCount: 1,
           createdAt: 1,
+          userId: 1,
           user: { $arrayElemAt: ["$user.name", 0] },
           titleName: { $arrayElemAt: ["$titleName.title", 0] }
         }

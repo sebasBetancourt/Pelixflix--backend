@@ -88,7 +88,7 @@ class TitleModel {
 
 
 
-  static async findAll({ skip = 0, limit = 10, categoryId = null, status = 'approved', type = null } = {}) {
+  static async findAll({ skip = 0, limit = 30, categoryId = null, status = 'approved', type = null } = {}) {
     try {
       const pipeline = [];
       const match = {};
