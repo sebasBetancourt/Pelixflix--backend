@@ -157,6 +157,15 @@ export class ReviewController {
       res.status(500).json({ message: "Error al dar dislike", error: err.message });
     }
   }
+  static async calculateRanking(req, res) {
+    try {
+      const { titleId } = req.params;
+      const ranking = await ReviewModel.calculateRanking(titleId);
+      res.json({ titleId, ranking });
+    } catch (err) {
+      res.status(500).json({ error: err.message });
+    }
+  }
 }
 
 export default ReviewController;

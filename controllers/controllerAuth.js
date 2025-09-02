@@ -34,7 +34,7 @@ export class AuthController {
       );
 
       const userDTO = new UserDTO(user);
-      console.log('Login exitoso, token generado:', token); // Para depuración
+      console.log('Login exitoso, token generado:', token); 
       res.json({
         message: 'Login exitoso',
         user: {

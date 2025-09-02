@@ -19,4 +19,6 @@ router.put("/like/:id", reviewController.like);
 
 router.put("/dislike/:id", reviewController.dislike);
 
+router.get("/ranking/:titleId", ReviewController.calculateRanking);
+
 export default router;

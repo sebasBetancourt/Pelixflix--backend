@@ -45,7 +45,6 @@ app.use((req, res, next) => {
 
 app.use(morgan('combined'));
 app.use(express.urlencoded({ extended: true }));
-app.use(cookieParser());
 
 // Passport
 app.use(passport.initialize());
