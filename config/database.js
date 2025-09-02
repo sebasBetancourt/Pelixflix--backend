@@ -235,7 +235,6 @@ class Database {
     const categoriesCollection = this.getCollection('categories');
 
     // Crear índices
-    await categoriesCollection.createIndex({ slug: 1 }, { unique: true });
     await categoriesCollection.createIndex({ name: 1 }, { unique: true });
 
     // Validación de esquema
@@ -245,10 +244,9 @@ class Database {
         validator: {
           $jsonSchema: {
             bsonType: 'object',
-            required: ['name', 'slug', 'createdAt'],
+            required: ['name', 'createdAt'],
             properties: {
               name: { bsonType: 'string' },
-              slug: { bsonType: 'string' },
               createdAt: { bsonType: 'date' }
             }
           }
@@ -268,7 +266,6 @@ class Database {
     // Crear índices
     await reviewsCollection.createIndex({ titleId: 1 });
     await reviewsCollection.createIndex({ userId: 1 });
-    await reviewsCollection.createIndex({ reported: 1 });
     await reviewsCollection.createIndex({ createdAt: -1 });
 
     // Validación de esquema
@@ -284,12 +281,10 @@ class Database {
               userId: { bsonType: 'objectId' },
               title: { bsonType: 'string' },
               comment: { bsonType: 'string' },
-              score: { bsonType: 'number', minimum: 1, maximum: 10 },
+              score: { bsonType: 'number', minimum: 1, maximum: 5 },
               likesCount: { bsonType: 'number', minimum: 0 },
               dislikesCount: { bsonType: 'number', minimum: 0 },
-              reported: { bsonType: 'bool' },
-              createdAt: { bsonType: 'date' },
-              updatedAt: { bsonType: 'date' }
+              createdAt: { bsonType: 'date' }
             }
           }
         }

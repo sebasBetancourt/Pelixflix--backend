@@ -1,9 +1,5 @@
-import bcrypt from 'bcrypt';
-import { ObjectId } from 'mongodb';
-
 class UserDTO {
   constructor(user) {
-    this.id = user._id ? user._id.toString() : null;
     this.email = user.email;
     this.name = user.name;
     this.role = user.role || 'user';
@@ -21,17 +17,16 @@ class UserDTO {
     this.lists = user.lists || [];
   }
 
-  static async createFromData(userData) {
+  static createFromData(userData) {
     return {
-      _id: userData._id ? new ObjectId(userData._id) : new ObjectId(),
       email: userData.email,
-      passwordHash: userData.passwordHash,  // ya viene hasheada
+      passwordHash: userData.passwordHash,
       role: userData.role || 'user',
       name: userData.name ?? null,
       phone: userData.phone ?? null,
       country: userData.country ?? null,
       avatarUrl: userData.avatarUrl ?? "",
-      createdAt: userData.createdAt || new Date(),
+      createdAt: new Date(),
       banned: userData.banned ?? false,
       preferences: userData.preferences || {
         marketingEmails: false,

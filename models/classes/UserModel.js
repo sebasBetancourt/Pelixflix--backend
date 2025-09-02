@@ -14,8 +14,8 @@ class UserModel {
 
   static async create(userData) {
     try {
-      
-      console.log('Documento a insertar:', JSON.stringify(userData, null, 2));
+      console.log(userData);
+      console.log(typeof(userData));
       const result = await this.getDb().collection(this.collectionName).insertOne(userData);
       return result.insertedId;
     } catch (err) {

@@ -34,7 +34,7 @@ export class AuthController {
       );
 
       const userDTO = new UserDTO(user);
-      console.log('Login exitoso, token generado:', token); // Para depuración
+      console.log('Login exitoso, token generado:', token); 
       res.json({
         message: 'Login exitoso',
         user: {
@@ -66,7 +66,7 @@ export class AuthController {
 
       const saltRounds = 10;
       const hashedPassword = await bcrypt.hash(password, saltRounds);
-      const data = UserDTO.createFromData({
+      const data = await UserDTO.createFromData({
         email,
         name,
         passwordHash: hashedPassword,

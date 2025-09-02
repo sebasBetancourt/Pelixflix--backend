@@ -17,6 +17,9 @@ import userRoutes from "./routers/user.js"
 import UserRouter from "./routers/UserRoute.js";
 import authRoutes from "./routers/auth.js";
 import { startServer } from "./helpers/server.js";
+import titleRoutes from "./routers/TitleRouter.js";
+import categoriesRoutes from "./routers/CategoriesRoute.js";
+import reviewsRoutes from "./routers/ReviewsRoutes.js"
 
 
 dotenv.config();
@@ -29,10 +32,9 @@ app.use(express.json({ limit: '10mb' }));
 app.use(helmet());
 app.use(cors({
   origin: process.env.FRONTEND_URL || 'http://localhost:5173',
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true
 }));
+
 
 app.use((req, res, next) => {
   res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, private');
@@ -43,7 +45,6 @@ app.use((req, res, next) => {
 
 app.use(morgan('combined'));
 app.use(express.urlencoded({ extended: true }));
-app.use(cookieParser());
 
 // Passport
 app.use(passport.initialize());
@@ -58,11 +59,14 @@ app.use("/users", UserRouter);
 app.use("/version", versionRouter);
 app.use("/auth", authRoutes);
 app.use("/user", userRoutes);
+app.use("/titles", titleRoutes);
+app.use("/categories", categoriesRoutes);
+app.use("/reviews", reviewsRoutes);
 
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-const swaggerPath = path.join(__dirname, "../swagger.json");
+const swaggerPath = path.join(__dirname, "./swagger.json");
 
 if (fs.existsSync(swaggerPath)) {
   const swaggerDocument = JSON.parse(fs.readFileSync(swaggerPath, "utf-8"));
