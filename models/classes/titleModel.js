@@ -93,12 +93,10 @@ class TitleModel {
       const pipeline = [];
       const match = {};
 
-      // Filtrar por categoría
       if (categoryId) {
         match.categoriesIds = new ObjectId(categoryId); 
       }
 
-      // Filtrar por status y tipo
       if (status) match.status = status;
       if (type) match.type = type;
 

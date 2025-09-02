@@ -1,5 +1,6 @@
 import database from '../../config/database.js';
 import { ObjectId } from 'mongodb';
+import UserDTO from '../dto/UserDTO.js';
 
 class UserModel {
   static collectionName = 'users';
