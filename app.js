@@ -19,6 +19,7 @@ import authRoutes from "./routers/auth.js";
 import { startServer } from "./helpers/server.js";
 import titleRoutes from "./routers/TitleRouter.js";
 import categoriesRoutes from "./routers/CategoriesRoute.js";
+import reviewsRoutes from "./routers/ReviewsRoutes.js"
 
 
 dotenv.config();
@@ -61,6 +62,7 @@ app.use("/auth", authRoutes);
 app.use("/user", userRoutes);
 app.use("/titles", titleRoutes);
 app.use("/categories", categoriesRoutes);
+app.use("/reviews", reviewsRoutes);
 
 
 const __filename = fileURLToPath(import.meta.url);

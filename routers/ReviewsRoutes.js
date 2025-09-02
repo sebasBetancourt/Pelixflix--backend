@@ -1,17 +1,22 @@
 import { Router } from "express";
 import { ReviewController } from "../controllers/controllerReviews.js";
+import { reviewsValidator } from "../middleware/validators/reviewsValidator.js";
 
 const router = Router();
 const reviewController = new ReviewController();
 
-router.post("/", (req, res) => reviewController.createReview(req, res));
+router.post("/create", reviewsValidator,reviewController.create);
 
-router.get("/", (req, res) => reviewController.getReviews(req, res));
+router.get("/list", reviewController.list);
 
-router.get("/:id", (req, res) => reviewController.getReviewById(req, res));
+router.get("/:id", reviewController.getById);
 
-router.put("/:id", (req, res) => reviewController.updateReview(req, res));
+router.put("/:id", reviewsValidator,reviewController.update);
 
-router.delete("/:id", (req, res) => reviewController.deleteReview(req, res));
+router.delete("/:id", reviewController.delete);
+
+router.put("/like/:id", reviewController.like);
+
+router.put("/dislike/:id", reviewController.dislike);
 
 export default router;

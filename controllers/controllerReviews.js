@@ -128,9 +128,7 @@ export class ReviewController {
         return res.status(400).json({ message: "No puedes dar like a tu propia reseña" });
       }
 
-      const updated = await ReviewModel.update(id, {
-        likesCount: (review.likesCount || 0) + 1
-      });
+      const updated = await ReviewModel.like(id);
 
       if (!updated) return res.status(400).json({ message: "No se pudo dar like" });
 
@@ -150,9 +148,7 @@ export class ReviewController {
         return res.status(400).json({ message: "No puedes dar dislike a tu propia reseña" });
       }
 
-      const updated = await ReviewModel.update(id, {
-        dislikesCount: (review.dislikesCount || 0) + 1
-      });
+      const updated = await ReviewModel.dislike(id);
 
       if (!updated) return res.status(400).json({ message: "No se pudo dar dislike" });
 

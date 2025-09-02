@@ -86,7 +86,7 @@ class ReviewModel {
           from: "titles",
           localField: "titleId",
           foreignField: "_id",
-          as: "titleCategory"
+          as: "titleName"
         }
       });
 
@@ -100,7 +100,7 @@ class ReviewModel {
           dislikesCount: 1,
           createdAt: 1,
           user: { $arrayElemAt: ["$user.name", 0] },
-          titleCategory: { $arrayElemAt: ["$titleCategory.title", 0] }
+          titleName: { $arrayElemAt: ["$titleName.title", 0] }
         }
       });
 
