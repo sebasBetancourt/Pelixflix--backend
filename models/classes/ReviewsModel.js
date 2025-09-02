@@ -37,19 +37,20 @@ class ReviewModel {
             from: "titles",
             localField: "titleId",
             foreignField: "_id",
-            as: "title"
+            as: "titleCategory"
           }
         },
         {
           $project: {
             _id: 1,
             comment: 1,
+            title: 1,
             score: 1,
             likesCount: 1,
             dislikesCount: 1,
             createdAt: 1,
             user: { $arrayElemAt: ["$user", 0] },
-            title: { $arrayElemAt: ["$title", 0] }
+            titleCategory: { $arrayElemAt: ["$titleCategory", 0] }
           }
         }
       ];
@@ -85,20 +86,21 @@ class ReviewModel {
           from: "titles",
           localField: "titleId",
           foreignField: "_id",
-          as: "title"
+          as: "titleCategory"
         }
       });
 
       pipeline.push({
         $project: {
           _id: 1,
+          title: 1,
           comment: 1,
           score: 1,
           likesCount: 1,
           dislikesCount: 1,
           createdAt: 1,
           user: { $arrayElemAt: ["$user.name", 0] },
-          title: { $arrayElemAt: ["$title.title", 0] }
+          titleCategory: { $arrayElemAt: ["$titleCategory.title", 0] }
         }
       });
 
