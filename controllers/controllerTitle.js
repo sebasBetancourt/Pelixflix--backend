@@ -10,9 +10,6 @@ export class TitleController {
 
   async create(req, res) {
     try {
-      if (req.user.role !== 'admin') {
-        return res.status(403).json({ message: 'Solo los administradores pueden crear títulos' });
-      }
 
       const { title, description, type, year, categoriesIds, posterUrl, author, temps, epds, createdBy } = req.body;
 

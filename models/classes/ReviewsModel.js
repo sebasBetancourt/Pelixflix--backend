@@ -66,12 +66,12 @@ class ReviewModel {
     try {
       const pipeline = [];
       const match = {};
-
+    
       if (titleId) match.titleId = new ObjectId(titleId);
       if (userId) match.userId = new ObjectId(userId);
-
+    
       pipeline.push({ $match: match });
-
+    
       pipeline.push({
         $lookup: {
           from: "users",
@@ -80,16 +80,16 @@ class ReviewModel {
           as: "user"
         }
       });
-
+    
       pipeline.push({
         $lookup: {
           from: "titles",
           localField: "titleId",
           foreignField: "_id",
-          as: "titleName"
+          as: "titleDoc"
         }
       });
-
+    
       pipeline.push({
         $project: {
           _id: 1,
@@ -100,19 +100,26 @@ class ReviewModel {
           dislikesCount: 1,
           createdAt: 1,
           userId: 1,
-          user: { $arrayElemAt: ["$user.name", 0] },
-          titleName: { $arrayElemAt: ["$titleName.title", 0] }
+          user: {
+            name: { $arrayElemAt: ["$user.name", 0] },
+            email: { $arrayElemAt: ["$user.email", 0] }
+          },
+          titleName: { $arrayElemAt: ["$titleDoc.title", 0] }
         }
       });
-
+    
       pipeline.push({ $skip: skip });
       pipeline.push({ $limit: limit });
-
-      return await this.getDb().collection(this.collectionName).aggregate(pipeline).toArray();
+    
+      return await this.getDb()
+        .collection(this.collectionName)
+        .aggregate(pipeline)
+        .toArray();
     } catch (err) {
       throw new Error(`Error al listar reseñas: ${err.message}`);
     }
   }
+
 
   static async update(id, updateData) {
     try {

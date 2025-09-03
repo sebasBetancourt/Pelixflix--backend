@@ -1,6 +1,6 @@
 import UserModel from '../models/classes/UserModel.js'; 
 import  UserDTO  from '../models/dto/UserDTO.js';
-import jwt from 'jsonwebtoken';
+import jwt, { decode } from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
 
 
@@ -28,16 +28,18 @@ export class AuthController {
       await UserModel.update(user._id, { lastLoginAt: new Date() });
 
       const token = jwt.sign(
-        { id: user._id.toString(), email: user.email, role: user.role },
+        { _id: user._id.toString(), email: user.email, role: user.role },
         process.env.JWT_SECRET,
-        { expiresIn: process.env.JWT_EXPIRES_IN || '2h' }
+        { expiresIn: "1d" }
       );
+
 
       const userDTO = new UserDTO(user);
       console.log('Login exitoso, token generado:', token); 
       res.json({
         message: 'Login exitoso',
         user: {
+          _id: userDTO.id,
           email: userDTO.email,
           role: userDTO.role
         },
@@ -89,28 +91,27 @@ export class AuthController {
     }
   }
 
-  async verify(req, res) {
-    try {
-      const token = req.headers.authorization?.split('Bearer ')[1];
-      if (!token) {
-        console.log('No se proporcionó token');
-        return res.status(401).json({ message: 'No se proporcionó token' });
-      }
+    async verify(req, res, next) {
+      try {
+        const token = req.headers.authorization?.split("Bearer ")[1];
+        if (!token) {
+          return res.status(401).json({ message: "No se proporcionó token" });
+        }
 
-      const decoded = jwt.verify(token, process.env.JWT_SECRET);
-      console.log('Token decodificado:', decoded); // Para depuración
-      const user = await UserModel.findByEmail(decoded.email);
-      if (!user) {
-        console.log('Usuario no encontrado:', decoded.email);
-        return res.status(401).json({ message: 'Usuario no encontrado' });
-      }
+        const decoded = jwt.verify(token, process.env.JWT_SECRET) ;
 
-      res.json({ message: 'Token válido', user: { email: user.email, role: user.role } });
-    } catch (err) {
-      console.error('Error en verify:', err);
-      res.status(500).json({ message: 'Token inválido', error: err.message });
+        req.user = {
+          _id: decoded._id || decoded.id,
+          email: decoded.email,
+          role: decoded.role,
+        } ;
+
+        next();
+      } catch (err) {
+        return res.status(401).json({ message: "Token inválido", error: err.message });
+      }
     }
-  }
+
 }
 
 export default AuthController;

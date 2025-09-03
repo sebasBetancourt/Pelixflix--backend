@@ -8,30 +8,26 @@ const db = database.db;
 export class ReviewController {
   async create(req, res) {
     try {
-      const { title, titleId, comment, score } = req.body;
+      const { title, comment, score, titleId } = req.body;
 
-      if (!title || !titleId || !comment || !score) {
-        return res.status(400).json({ message: "Faltan campos obligatorios" });
-      }
-
-      if (score < 1 || score > 5) {
-        return res.status(400).json({ message: "La calificación debe estar entre 1 y 5" });
-      }
-
-      const reviewData = ReviewDTO.createFromData({
+      const reviewData = {
         title,
+        comment,
+        score,
         titleId: new ObjectId(titleId),
         userId: new ObjectId(req.user._id),
-        comment,
-        score
-      });
+      };
 
-      const id = await ReviewModel.create(reviewData);
-      res.status(201).json({ message: "Reseña creada exitosamente", id });
+      const reviewDTO = ReviewDTO.createFromData(reviewData);
+
+      const newReview = await ReviewModel.create(reviewDTO);
+      res.status(201).json(newReview);
     } catch (err) {
       res.status(500).json({ message: "Error al crear reseña", error: err.message });
     }
   }
+
+
 
   async list(req, res) {
     try {
@@ -124,7 +120,7 @@ export class ReviewController {
       const review = await ReviewModel.findById(id);
 
       if (!review) return res.status(404).json({ message: "Reseña no encontrada" });
-      if (review.userId.toString() === req.user._id.toString()) {
+      if (review.user.toString() === req.user._id.toString()) {
         return res.status(400).json({ message: "No puedes dar like a tu propia reseña" });
       }
 
@@ -144,7 +140,7 @@ export class ReviewController {
       const review = await ReviewModel.findById(id);
 
       if (!review) return res.status(404).json({ message: "Reseña no encontrada" });
-      if (review.userId.toString() === req.user._id.toString()) {
+      if (review.user.toString() === req.user._id.toString()) {
         return res.status(400).json({ message: "No puedes dar dislike a tu propia reseña" });
       }
 

@@ -7,5 +7,8 @@ const authController = new AuthController();
 
 router.post('/register', registerValidator, authController.register);
 router.post('/login', loginValidator, authController.login);
-router.get('/verify', authController.verify);
+router.get("/verify", authController.verify, (req, res) => {
+  res.json({ message: "Token válido", user: req.user });
+});
+
 export default router;

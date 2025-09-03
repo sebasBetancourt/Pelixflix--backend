@@ -1,5 +1,8 @@
+import { ObjectId } from "mongodb";
+
 class UserDTO {
   constructor(user) {
+    this._id = new ObjectId(),
     this.email = user.email;
     this.name = user.name;
     this.role = user.role || 'user';
@@ -19,6 +22,7 @@ class UserDTO {
 
   static createFromData(userData) {
     return {
+      _id: userData._id || new ObjectId(),
       email: userData.email,
       passwordHash: userData.passwordHash,
       role: userData.role || 'user',
@@ -40,7 +44,7 @@ class UserDTO {
 
   toResponse() {
     return {
-      id: this.id,
+      _id: this._id,
       email: this.email,
       name: this.name,
       role: this.role,
