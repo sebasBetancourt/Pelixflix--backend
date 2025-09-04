@@ -5,7 +5,7 @@ import config from "../config/config.js";
 export async function startServer(app) {
   try {
     // Conectar a la base de datos
-    await database.connect(config.mongodb.uri, config.mongodb.dbName);
+    await database.connect(config.mongodb.uri , config.mongodb.dbName);
     console.log('Base de datos conectada correctamente');
     
     // Iniciar servidor

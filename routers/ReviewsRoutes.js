@@ -23,4 +23,7 @@ router.put("/dislike/:id", authController.verify, reviewController.dislike);
 
 router.get("/ranking/:titleId", ReviewController.calculateRanking);
 
+
+router.get("/CSV", reviewController.generateCSV);
+
 export default router;

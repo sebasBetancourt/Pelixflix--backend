@@ -193,6 +193,60 @@ class ReviewModel {
       throw new Error(`Error al calcular ranking: ${err.message}`);
     }
   }
+
+  static async generateCSV({ titleId = null } = {}) {
+    try {
+      const pipeline = [];
+      const match = {};
+    
+      if (titleId) match.titleId = new ObjectId(titleId);
+    
+      pipeline.push({ $match: match });
+    
+      pipeline.push({
+        $lookup: {
+          from: "users",
+          localField: "userId",
+          foreignField: "_id",
+          as: "user"
+        }
+      });
+    
+      pipeline.push({
+        $lookup: {
+          from: "titles",
+          localField: "titleId",
+          foreignField: "_id",
+          as: "titleDoc"
+        }
+      });
+    
+      pipeline.push({
+        $project: {
+          _id: 1,
+          title: 1,
+          comment: 1,
+          score: 1,
+          createdAt: 1,
+          userId: 1,
+          user: {
+            name: { $arrayElemAt: ["$user.name", 0] },
+            email: { $arrayElemAt: ["$user.email", 0] }
+          },
+          titleName: { $arrayElemAt: ["$titleDoc.title", 0] }
+        }
+      });
+    
+    
+      return await this.getDb()
+        .collection(this.collectionName)
+        .aggregate(pipeline)
+        .toArray();
+    } catch (err) {
+      throw new Error(`Error al generar CSV reseñas: ${err.message}`);
+    }
+  }
+
 }
 
 export default ReviewModel;

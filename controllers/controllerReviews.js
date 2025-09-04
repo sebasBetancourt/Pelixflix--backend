@@ -2,6 +2,7 @@ import ReviewModel from '../models/classes/ReviewsModel.js';
 import ReviewDTO from '../models/dto/ReviewsDTO.js';
 import database from '../config/database.js';
 import { ObjectId } from 'mongodb';
+import fs from "fs/promises"
 
 const db = database.db;
 
@@ -162,6 +163,50 @@ export class ReviewController {
       res.status(500).json({ error: err.message });
     }
   }
+
+
+  async generateCSV(req, res) {
+    try {
+      const { titleId = null} = req.query;
+
+      const reviews = await ReviewModel.generateCSV({
+        titleId
+      });
+
+      const ruta = '../exports/reviews.json';
+
+      async function esribir(ruta, reviews) {
+        try {
+          await fs.writeFileSync(ruta, JSON.stringify(reviews, null, 2));
+          console.log("Hecho");
+          
+        } catch (error) {
+          throw new Error("Eror al crear CSV");
+          
+        }
+      }
+
+      esribir(ruta, reviews);
+
+      res.status(200)({ message: "CSV generado exitosamente" });
+      res.json(reviews)
+    } catch (err) {
+      res.status(500).json({ message: "Error al listar reseñas", error: err.message });
+    }
+  }
+
+  async getById(req, res) {
+    try {
+      const { id } = req.params;
+      const review = await ReviewModel.findById(id);
+
+      if (!review) return res.status(404).json({ message: "Reseña no encontrada" });
+      res.json(review);
+    } catch (err) {
+      res.status(500).json({ message: "Error al obtener reseña", error: err.message });
+    }
+  }
+
 }
 
 export default ReviewController;
