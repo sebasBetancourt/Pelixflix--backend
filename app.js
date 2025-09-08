@@ -31,9 +31,10 @@ app.use(express.json({ limit: '10mb' }));
 // Middlewares
 app.use(helmet());
 app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:5173',
-  credentials: true
+  origin: process.env.FRONTEND_URL?.split(",") || ["http://localhost:5173"],
+  credentials: true,
 }));
+
 
 
 app.use((req, res, next) => {
