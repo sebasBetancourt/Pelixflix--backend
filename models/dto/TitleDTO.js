@@ -1,88 +1,37 @@
+import { ObjectId } from "mongodb";
+
 class TitleDTO {
-  constructor(title) {
-    this.title = title.title;
-    this.description = title.description;
-    this.type = title.type;
-    if (this.type === "tv" || this.type === "anime") {
-      this.temps = title.temps || 1;
-      this.eps = title.eps || 1;
-    }
-    this.year = title.year;
-    this.createdAt = title.createdAt;
-    this.createdBy = title.createdBy;
-    this.likes = 0;
-    this.dislikes = 0;
-    this.categoriesIds = title.categoriesIds || [];
-    this.posterUrl = title.posterUrl || "";
-    this.ratingAvg = 0;
-    this.ratingCount = 0;
+  constructor(data) {
+    this.title = data.title;
+    this.description = data.description;
+    this.type = data.type;
+    this.year = data.year;
+    this.createdBy = data.createdBy instanceof ObjectId ? data.createdBy : new ObjectId(data.createdBy);
+    this.categoriesIds = data.categoriesIds?.map(id => new ObjectId(id)) || [];
+    this.posterUrl = data.posterUrl || "";
+    this.author = data.author;
+    this.createdAt = data.createdAt || new Date();
+    this.likes = 1;
+    this.dislikes = 1;
+    this.ratingAvg = 1;
+    this.ratingCount = 1;
     this.status = "pending";
-    this.author = title.author;
+
+    // Campos específicos para series o anime
+    if (this.type === "tv" || this.type === "anime") {
+      this.temps = data.temps || 1;
+      this.eps = data.eps || 1;
+    }
   }
 
-  static createFromDataMovie(titleData) {
-    return {
-      title : titleData.title,
-      description : titleData.description,
-      type : titleData.type,
-      year : titleData.year,
-      createdAt : new Date(),
-      createdBy : titleData.createdBy,
-      likes : 0,
-      dislikes : 0,
-      categoriesIds : titleData.categoriesIds || [],
-      posterUrl : titleData.posterUrl || "",
-      ratingAvg : 0,
-      ratingCount : 0,
-      status : "pending",
-      author : titleData.author
-    };
+  static fromRequest(data) {
+    return new TitleDTO({
+      ...data
+    });
   }
-
-
-  static createFromDataSerie(titleData) {
-    return {
-      title : titleData.title,
-      description : titleData.description,
-      type : titleData.type,
-      temps : titleData.temps || 1,
-      eps : titleData.eps || 1,
-      year : titleData.year,
-      createdAt : new Date(),
-      createdBy : titleData.createdBy,
-      likes : 0,
-      dislikes : 0,
-      categoriesIds : titleData.categoriesIds || [],
-      posterUrl : titleData.posterUrl || "",
-      ratingAvg : 0,
-      ratingCount : 0,
-      status : "pending",
-      author : titleData.author
-    };
-  }
-  
 
   toResponse() {
-    const response = {
-      title : this.title,
-      description : this.description,
-      type : this.type,
-      year : this.year,
-      createdAt : this.createdAt,
-      createdBy : this.createdBy,
-      likes : this.likes,
-      dislikes : this.dislikes,
-      categoriesIds : this.categoriesIds,
-      posterUrl : this.posterUrl,
-      ratingAvg : this.ratingAvg,
-      ratingCount : this.ratingCount,
-      status : this.status,
-      author : this.author
-    };
-    if (this.type === "tv" || this.type === "anime") {
-      this.temps = title.temps;
-      this.eps = title.eps;
-    };
+    const response = { ...this };
     return response;
   }
 }

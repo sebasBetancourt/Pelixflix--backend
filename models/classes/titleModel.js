@@ -1,8 +1,10 @@
 import database from '../../config/database.js';
 import { ObjectId } from 'mongodb';
+import TitleDTO from "../dto/TitleDTO.js"
 
 class TitleModel {
   static collectionName = 'titles';
+  static collectionNameUser = 'users';
 
   static getDb() {
     if (!database.isConnected || !database.db) {
@@ -13,14 +15,13 @@ class TitleModel {
 
   static async create(titleData) {
     try {
-      const exists = await this.getDb().collection(this.collectionName).findOne({ 
-        title: titleData.title 
-      });
-      if (exists) {
-        throw new Error('Ya existe un título con ese nombre');
-      }
+      const exists = await this.findByName(titleData.title);
+      if (exists) throw new Error("Ya existe un título con ese nombre");
 
-      const result = await this.getDb().collection(this.collectionName).insertOne(titleData);
+      const dto = TitleDTO.fromRequest(titleData);
+      console.log(dto);
+      
+      const result = await this.getDb().collection(this.collectionName).insertOne(dto);
       return result.insertedId;
     } catch (err) {
       throw new Error(`Error al crear título: ${err.message}`);
@@ -88,7 +89,7 @@ class TitleModel {
 
 
 
-  static async findAll({ skip = 0, limit = 30, categoryId = null, status = 'approved', type = null } = {}) {
+  static async findAll({ skip = 0, limit = 30, categoryId = null, status = 'approved', type = null, search = null } = {}) {
     try {
       const pipeline = [];
       const match = {};
@@ -99,6 +100,11 @@ class TitleModel {
 
       if (status) match.status = status;
       if (type) match.type = type;
+
+      if (search) {
+        // Coincidencia parcial (case-insensitive) en el título
+        match.title = { $regex: search, $options: 'i' };
+      }
 
       pipeline.push({ $match: match });
 
@@ -153,6 +159,70 @@ class TitleModel {
       throw new Error(`Error al listar todos los títulos: ${err.message}`);
     }
   }
+
+
+  static async findTitlesInUserLists({ userId, skip = 0, limit = 30, type } = {}) {
+  try {
+    const pipeline = [];
+
+    // 1️⃣ Filtrar por usuario
+    pipeline.push({ $match: { _id: new ObjectId(userId) } });
+
+    // 2️⃣ Traer solo lists
+    pipeline.push({ $project: { lists: 1 } });
+
+    // 3️⃣ Desenrollar listas
+    pipeline.push({ $unwind: "$lists" });
+
+    // 4️⃣ Lookup para traer info de titles
+    pipeline.push({
+      $lookup: {
+        from: "titles",
+        localField: "lists",
+        foreignField: "_id",
+        as: "titleInfo"
+      }
+    });
+
+    // 5️⃣ Desenrollar titleInfo
+    pipeline.push({ $unwind: "$titleInfo" });
+
+    // 6️⃣ Filtrar por tipo si se pasó
+    if (type) {
+      pipeline.push({
+        $match: { "titleInfo.type": type }
+      });
+    }
+
+    // 7️⃣ Proyectar campos que quieres mostrar
+    pipeline.push({
+      $project: {
+        _id: "$titleInfo._id",
+        title: "$titleInfo.title",
+        description: "$titleInfo.description",
+        type: "$titleInfo.type",
+        temps: "$titleInfo.temps",
+        eps: "$titleInfo.eps",
+        year: "$titleInfo.year",
+        posterUrl: "$titleInfo.posterUrl",
+        createdBy: "$titleInfo.createdBy",
+        categoriesIds: "$titleInfo.categoriesIds"
+      }
+    });
+
+    // 8️⃣ Paginación
+    pipeline.push({ $skip: skip });
+    pipeline.push({ $limit: limit });
+
+    return await this.getDb().collection("users").aggregate(pipeline).toArray();
+  } catch (err) {
+    throw new Error(`Error al listar títulos en listas de usuario: ${err.message}`);
+  }
+  }
+
+
+
+
 
 
 

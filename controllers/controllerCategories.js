@@ -15,7 +15,7 @@ export class CategoriesController {
       const { name } = req.body;
 
       if (!name) {
-        return res.status(400).json({ message: 'Faltan campos obligatorios, Nombre de la caategoria' });
+        return res.status(400).json({ message: 'Faltan campos obligatorios, Nombre de la categoria' });
       }
 
 

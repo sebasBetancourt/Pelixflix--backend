@@ -152,17 +152,7 @@ class Database {
                   dataRetentionMonths: { bsonType: ['int', 'null'], description: 'Debe ser un número o null' }
                 }
               },
-              lists: {
-                bsonType: 'array',
-                items: {
-                  bsonType: 'object',
-                  properties: {
-                    itemId: { bsonType: 'objectId' },
-                    type: { bsonType: 'string' },
-                    addedAt: { bsonType: 'date' }
-                  }
-                }
-              }
+              lists: { bsonType: 'array', items: { bsonType: 'objectId' } }
             }
           }
         },

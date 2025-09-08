@@ -15,6 +15,8 @@ router.get("/list", async function (req, res) {
   }
 });
 
+
+
 router.get("/get/:id", async function (req, res) {
   try {
     const idUsuario = parseInt(req.params.id);

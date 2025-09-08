@@ -13,4 +13,6 @@ router.get("/list", titleController.list);
 
 router.get("/:id", titleController.getById);
 
+router.get("/list/collection", authController.verify,titleController.listColeccion);
+
 export default router;
