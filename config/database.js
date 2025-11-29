@@ -178,10 +178,8 @@ class Database {
     );
     await titlesCollection.createIndex({ type: 1, status: 1, createdAt: -1 });
     await titlesCollection.createIndex({ genres: 1 });
-    await titlesCollection.createIndex(
-      { title: 1, year: 1, type: 1 },
-      { unique: true, partialFilterExpression: { title: { $exists: true } } }
-    );
+    await titlesCollection.createIndex({ tmdb_id: 1 }, { unique: true, sparse: true });
+    await titlesCollection.createIndex({ imdb_id: 1 }, { unique: true, sparse: true });
 
     // Validación de esquema
     try {
